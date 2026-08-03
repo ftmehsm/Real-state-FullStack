@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
-import { vazirmatn } from "@/app/fonts";
+import { vazirmatn } from "@/utils/fonts";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
