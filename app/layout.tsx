@@ -20,6 +20,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ملکینو",
   description: "سامانه آگهی املاک ملکینو",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
