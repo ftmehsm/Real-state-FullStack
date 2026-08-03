@@ -13,7 +13,6 @@ export default function Header() {
   return (
     <header className="border-b bg-background sticky top-0 z-50">
       <div className="container mx-auto h-16 flex items-center justify-between px-4">
-
         {/* Logo */}
         <Link
           href="/"
@@ -26,7 +25,6 @@ export default function Header() {
         {/* Menu */}
         <NavigationMenu>
           <NavigationMenuList className="gap-6">
-
             <NavigationMenuItem>
               <Link
                 href="/"
@@ -44,25 +42,14 @@ export default function Header() {
                 آگهی‌ها
               </Link>
             </NavigationMenuItem>
-
           </NavigationMenuList>
         </NavigationMenu>
 
         {/* Actions */}
         <div className="flex items-center gap-3">
-
           <Button variant="ghost">
-            <Link href="/login">
-              ورود
-            </Link>
+            <Link href="/login">ورود</Link>
           </Button>
-
-          <Button variant="ghost">
-            <Link href="/register">
-              ثبت‌نام
-            </Link>
-          </Button>
-
         </div>
       </div>
     </header>
