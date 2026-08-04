@@ -21,7 +21,7 @@ export default function SignupPage() {
         </div>
 
         {/* Left Side */}
-        <div className="hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between p-12">
+        <div className="hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between p-8">
 
           <div>
             <Link
