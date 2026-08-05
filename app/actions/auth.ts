@@ -2,14 +2,18 @@
 
 import { signup } from "@/lib/services/auth.services";
 
+type SignupState = {
+  success: boolean;
+  message: string;
+  email?: string;
+  password?: string;
+};
+
 
 export async function signupAction(
-  prevState: {
-    success: boolean;
-    message: string;
-  },
-  formData: FormData,
-) {
+  prevState: SignupState,
+  formData: FormData
+): Promise<SignupState> {
 
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
@@ -53,7 +57,10 @@ export async function signupAction(
     return {
       success: true,
       message: "حساب کاربری با موفقیت ایجاد شد",
+      email,
+      password
     };
+
 
 
   } catch (error) {
@@ -67,4 +74,7 @@ export async function signupAction(
     };
 
   }
+
+
+  
 }

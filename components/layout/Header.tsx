@@ -48,7 +48,7 @@ export default function Header() {
         {/* Actions */}
         <div className="flex items-center gap-3">
           <Button variant="ghost">
-            <Link href="/signup">ورود</Link>
+            <Link href="/login">ورود</Link>
           </Button>
         </div>
       </div>

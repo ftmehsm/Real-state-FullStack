@@ -23,8 +23,17 @@ import { Label } from "@/components/ui/label";
 
 import SubmitButton from "./SubmitButton";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
-const initialState = {
+
+type SignupState = {
+  success: boolean;
+  message: string;
+  email?: string;
+  password?: string;
+};
+
+const initialState: SignupState = {
   success: false,
   message: "",
 };
@@ -36,11 +45,24 @@ export default function SignupForm() {
   );
   const router = useRouter()
 
-  useEffect(()=>{
-    if(state.success){
-      router.push("/")
+
+  const {email,password,success} = state 
+  
+
+
+  useEffect(() => {
+    if (success && email && password) {
+      signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      }).then((res) => {
+        if (res?.ok) {
+          router.push("/");
+        }
+      });
     }
-  },[state.success,router])
+  }, [success, email, password, router]);
 
  
 
@@ -154,7 +176,7 @@ export default function SignupForm() {
             قبلاً ثبت‌نام کرده‌اید؟
 
             <Link
-              href="/auth/login"
+              href="/login"
               className="mr-1 text-primary hover:underline"
             >
               وارد شوید
