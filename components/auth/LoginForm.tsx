@@ -14,30 +14,35 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error , setError] = useState("")
+  const [error, setError] = useState("");
 
-  const router = useRouter()
+  const router = useRouter();
 
-  const loginHandler = async(e: React.FormEvent<HTMLFormElement>) => {
+  const loginHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true)
+
+    setLoading(true);
+    setError("");
 
     try {
-       const res = await signIn("credentials" , {email , password , redirect:false})
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-       setLoading(false)
+      if (res?.error) {
+        setError("ایمیل یا رمز عبور اشتباه است");
+        setLoading(false);
+        return;
+      }
 
-       if(res?.error){
-        console.log(res?.error)
-       }
-
-       router.push("/");
-
+      router.push("/");
     } catch (error) {
-        console.log(error)
+      setError("خطایی در ورود رخ داده است");
+    } finally {
+      setLoading(false);
     }
-
-
   };
 
   return (
@@ -65,7 +70,7 @@ export default function LoginForm() {
               placeholder="example@email.com"
               className="pr-10"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
         </div>
@@ -78,12 +83,17 @@ export default function LoginForm() {
           <Input
             id="password"
             type="password"
+            name="password"
             dir="ltr"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="********"
           />
         </div>
+
+        {error && (
+          <p className="text-sm text-center text-destructive">{error}</p>
+        )}
 
         <Button type="submit" className="w-full" size="lg" disabled={loading}>
           {loading ? "در حال ورود..." : "ورود"}

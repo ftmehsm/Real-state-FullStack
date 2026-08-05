@@ -1,7 +1,7 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -9,11 +9,7 @@ export default function SiteLayout({
   return (
     <>
       <Header />
-
-      <main className="flex-1">
-        {children}
-      </main>
-
+      <main className="flex-1">{children}</main>
       <Footer />
     </>
   );

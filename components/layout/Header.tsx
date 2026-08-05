@@ -7,9 +7,14 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
-import { Building2 } from "lucide-react";
+import { Building2, LogOut } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Header() {
+  const { data: session, status } = useSession();
+
+  console.log(session, status);
+
   return (
     <header className="border-b bg-background sticky top-0 z-50">
       <div className="container mx-auto h-16 flex items-center justify-between px-4">
@@ -46,11 +51,30 @@ export default function Header() {
         </NavigationMenu>
 
         {/* Actions */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost">
-            <Link href="/login">ورود</Link>
-          </Button>
-        </div>
+        {status === "authenticated" ? (
+          <div className="flex items-center gap-3">
+            <Button variant="outline">
+              <Link href="/dashboard">پنل کاربری</Link>
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() =>
+                signOut({
+                  callbackUrl: "/login",
+                })
+              }
+            >
+              <LogOut className="w-4 h-4 " />
+              خروج
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <Button variant="default">
+              <Link href="/login">ورود</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </header>
   );

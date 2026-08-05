@@ -4,6 +4,9 @@ import "./globals.css";
 
 import { cn } from "@/lib/utils";
 import { vazirmatn } from "@/utils/fonts";
+import AuthProvider from "@/components/providers/AuthProvider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +26,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html
       lang="fa"
@@ -36,12 +41,12 @@ export default function RootLayout({
         "h-full antialiased",
         vazirmatn.variable,
         geistSans.variable,
-        geistMono.variable
+        geistMono.variable,
       )}
       suppressHydrationWarning
     >
       <body className="min-h-screen font-sans">
-        {children}
+        <AuthProvider session={session}>{children}</AuthProvider>
       </body>
     </html>
   );
