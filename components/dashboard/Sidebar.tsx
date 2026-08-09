@@ -67,18 +67,7 @@ export default function DashboardSidebar({ user }: DashboardSidebarProps) {
           آگهی‌های من
         </Link>
 
-        <Link
-          href="/dashboard/profile"
-          className={cn(
-            buttonVariants({
-              variant: "ghost",
-            }),
-            "w-full justify-start",
-          )}
-        >
-          <User className="ml-2 size-5" />
-          اطلاعات حساب کاربری
-        </Link>
+        
 
         <Link
           href="/dashboard/create-ad"

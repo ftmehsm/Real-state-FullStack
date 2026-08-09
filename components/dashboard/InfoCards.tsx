@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { FileText, PlusCircle, User } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { User as UserType } from "@/types/User";
+import { User as UserType } from "@/types/types";
 import { toJalaliDate } from "@/utils/dateFormatter";
 
 export default function InfoCards({ user }: { user: UserType }) {

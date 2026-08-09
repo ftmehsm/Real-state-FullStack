@@ -3,8 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import User from "@/models/User";
 import InfoCards from "@/components/dashboard/InfoCards";
+import connectDB from "@/utils/connectDB";
 
 export default async function DashboardPage() {
+  await connectDB();
+
   const session = await getServerSession(authOptions);
 
   const user = await User.findOne({ email: session?.user?.email });
