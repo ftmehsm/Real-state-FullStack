@@ -2,8 +2,6 @@ import { login } from "@/lib/services/auth.services";
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-// import { login } from "@/services/auth/login";
-
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
