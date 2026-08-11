@@ -60,7 +60,7 @@ export async function login({email,password}: loginParams){
 
   }
 
-  const verifiedPass = verifyPassword(password,user.password)
+  const verifiedPass = await verifyPassword(password,user.password)
 
   if(!verifiedPass){
     throw new Error("ایمیل یا رمز عبور اشتباه است");

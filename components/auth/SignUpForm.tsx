@@ -9,7 +9,7 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 
-import { signupAction } from "@/app/actions/auth";
+import { signupAction } from "@/app/actions/auth.actions.ts";
 
 import {
   CardContent,

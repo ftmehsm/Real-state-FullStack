@@ -37,7 +37,7 @@ export async function signupAction(
   }
 
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))  {
     return {
       success: false,
       message: "فرمت ایمیل ورودی معتبر نیست",
@@ -58,7 +58,6 @@ export async function signupAction(
       success: true,
       message: "حساب کاربری با موفقیت ایجاد شد",
       email,
-      password
     };
 
 
