@@ -9,7 +9,7 @@ import {
   HiOutlineUser,
 } from "react-icons/hi2";
 
-import { signupAction } from "@/app/actions/auth.actions.ts";
+import { signupAction } from "@/app/actions/auth.actions";
 
 import {
   CardContent,
@@ -23,14 +23,10 @@ import { Label } from "@/components/ui/label";
 
 import SubmitButton from "./SubmitButton";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-
 
 type SignupState = {
   success: boolean;
   message: string;
-  email?: string;
-  password?: string;
 };
 
 const initialState: SignupState = {
@@ -39,40 +35,19 @@ const initialState: SignupState = {
 };
 
 export default function SignupForm() {
-  const [state, formAction] = useActionState(
-    signupAction,
-    initialState
-  );
-  const router = useRouter()
-
-
-  const {email,password,success} = state 
-  
-
+  const [state, formAction] = useActionState(signupAction, initialState);
+  const router = useRouter();
 
   useEffect(() => {
-    if (success && email && password) {
-      signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      }).then((res) => {
-        if (res?.ok) {
-          router.push("/");
-        }
-      });
+    if (state.success) {
+      router.push("/login");
     }
-  }, [success, email, password, router]);
-
- 
+  }, [state.success, router]);
 
   return (
     <div className="w-2/3">
-
       <CardHeader className="space-y-1 text-center mb-5">
-        <CardTitle className="text-3xl font-bold">
-          ایجاد حساب کاربری
-        </CardTitle>
+        <CardTitle className="text-3xl font-bold">ایجاد حساب کاربری</CardTitle>
 
         <CardDescription>
           برای استفاده از امکانات ملکینو ثبت‌نام کنید.
@@ -80,13 +55,9 @@ export default function SignupForm() {
       </CardHeader>
 
       <CardContent>
-
         <form action={formAction} className="space-y-5">
-
           <div className="space-y-2">
-            <Label htmlFor="name">
-              نام
-            </Label>
+            <Label htmlFor="name">نام</Label>
 
             <div className="relative">
               <HiOutlineUser className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-lg" />
@@ -101,11 +72,8 @@ export default function SignupForm() {
             </div>
           </div>
 
-
           <div className="space-y-2">
-            <Label htmlFor="email">
-              ایمیل
-            </Label>
+            <Label htmlFor="email">ایمیل</Label>
 
             <div className="relative">
               <HiOutlineEnvelope className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-lg" />
@@ -121,11 +89,8 @@ export default function SignupForm() {
             </div>
           </div>
 
-
           <div className="space-y-2">
-            <Label htmlFor="password">
-              رمز عبور
-            </Label>
+            <Label htmlFor="password">رمز عبور</Label>
 
             <div className="relative">
               <HiOutlineLockClosed className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-lg" />
@@ -141,11 +106,8 @@ export default function SignupForm() {
             </div>
           </div>
 
-
           <div className="space-y-2">
-            <Label htmlFor="repeatPassword">
-              تکرار رمز عبور
-            </Label>
+            <Label htmlFor="repeatPassword">تکرار رمز عبور</Label>
 
             <div className="relative">
               <HiOutlineLockClosed className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-lg" />
@@ -161,32 +123,20 @@ export default function SignupForm() {
             </div>
           </div>
 
-
           {state.message && (
-            <p className="text-sm text-center text-primary">
-              {state.message}
-            </p>
+            <p className="text-sm text-center text-primary">{state.message}</p>
           )}
-
 
           <SubmitButton />
 
-
           <div className="text-center text-sm text-muted-foreground">
             قبلاً ثبت‌نام کرده‌اید؟
-
-            <Link
-              href="/login"
-              className="mr-1 text-primary hover:underline"
-            >
+            <Link href="/login" className="mr-1 text-primary hover:underline">
               وارد شوید
             </Link>
           </div>
-
         </form>
-
       </CardContent>
-
     </div>
   );
 }
