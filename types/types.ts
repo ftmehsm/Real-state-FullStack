@@ -28,18 +28,27 @@ export interface Ad {
   constructionDate: string;
 }
 
-export interface AdActionState {
+export type AdActionState = {
   success: boolean;
   message?: string;
-  errors?: Partial<Record<keyof Ad, string>>;
-}
+  errors?: {
+    name?: string;
+    category?: string;
+    phone?: string;
+    description?: string;
+    address?: string;
+    transactionType?: string;
+    area?: string;
+    price?: string;
+    deposit?: string;
+    rent?: string;
+    constructionDate?: string;
+  };
+};
 
 export interface CreateAdFormProps {
   initialData?: Partial<Ad>;
   categories: string[];
-  action: (
-    state: AdActionState,
-    formData: FormData
-  ) => Promise<AdActionState>;
+  action: (state: AdActionState, formData: FormData) => Promise<AdActionState>;
   isEditing?: boolean;
 }

@@ -1,13 +1,14 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { Input } from "@/components/ui/input";
-
 import { Textarea } from "@/components/ui/textarea";
-
+import { toast } from "@/components/ui/toast";
 import {
   Select,
   SelectContent,
@@ -15,11 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { Label } from "@/components/ui/label";
-
 import { Button } from "@/components/ui/button";
-
 import { Separator } from "@/components/ui/separator";
 
 import type {
@@ -28,10 +26,12 @@ import type {
   CreateAdFormProps,
   TransactionType,
 } from "@/types/types";
+
 import DynamicStringList from "./dynamic-string-list";
 
 const initialActionState: AdActionState = {
   success: false,
+  errors: {},
 };
 
 const defaultData: Ad = {
@@ -66,6 +66,23 @@ export default function CreateAdForm({
     initialActionState,
   );
 
+  useEffect(() => {
+    if (!state.message) return;
+  
+    if (state.success) {
+      toast.add({
+        type: "success",
+        description: state.message,
+      })
+    } else {
+      toast.add({
+        type: "error",
+        description: state.message,
+        priority: "high",
+      })
+    }
+  }, [state.message, state.success]);
+  
   const data = {
     ...defaultData,
     ...initialData,
@@ -78,6 +95,12 @@ export default function CreateAdForm({
   const [amenities, setAmenities] = useState<string[]>(data.amenities);
 
   const [rules, setRules] = useState<string[]>(data.rules);
+
+  const [constructionDate, setConstructionDate] = useState(
+    data.constructionDate,
+  );
+
+  
 
   return (
     <form action={formAction}>
@@ -113,7 +136,6 @@ export default function CreateAdForm({
                   name="name"
                   defaultValue={data.name}
                   placeholder="مثلاً آپارتمان ۱۲۰ متری"
-                  required
                 />
 
                 {state.errors?.name && (
@@ -127,7 +149,7 @@ export default function CreateAdForm({
               <div className="space-y-2">
                 <Label htmlFor="category">دسته‌بندی</Label>
 
-                <Select name="category" defaultValue={data.category} required>
+                <Select name="category" defaultValue={data.category}>
                   <SelectTrigger id="category">
                     <SelectValue placeholder="دسته‌بندی را انتخاب کنید" />
                   </SelectTrigger>
@@ -159,8 +181,13 @@ export default function CreateAdForm({
                   defaultValue={data.phone}
                   placeholder="09123456789"
                   dir="ltr"
-                  required
                 />
+
+                {state.errors?.phone && (
+                  <p className="text-sm text-destructive">
+                    {state.errors.phone}
+                  </p>
+                )}
               </div>
 
               {/* بنگاه */}
@@ -186,8 +213,13 @@ export default function CreateAdForm({
                 defaultValue={data.description}
                 placeholder="توضیحات کامل ملک..."
                 className="min-h-32 resize-y"
-                required
               />
+
+              {state.errors?.description && (
+                <p className="text-sm text-destructive">
+                  {state.errors.description}
+                </p>
+              )}
             </div>
 
             {/* آدرس */}
@@ -200,12 +232,17 @@ export default function CreateAdForm({
                 defaultValue={data.address}
                 placeholder="آدرس کامل ملک"
                 className="min-h-24 resize-y"
-                required
               />
+
+              {state.errors?.address && (
+                <p className="text-sm text-destructive">
+                  {state.errors.address}
+                </p>
+              )}
             </div>
           </section>
 
-          {/* معامله */}
+          {/* اطلاعات معامله */}
           <section className="space-y-5">
             <div>
               <h2 className="font-heading text-base font-semibold text-primary">
@@ -245,6 +282,12 @@ export default function CreateAdForm({
                     <SelectItem value="rent">اجاره</SelectItem>
                   </SelectContent>
                 </Select>
+
+                {state.errors?.transactionType && (
+                  <p className="text-sm text-destructive">
+                    {state.errors.transactionType}
+                  </p>
+                )}
               </div>
 
               {/* متراژ */}
@@ -258,11 +301,17 @@ export default function CreateAdForm({
                   min={0}
                   defaultValue={data.area || ""}
                   placeholder="مثلاً ۱۲۰"
-                  required
                 />
+
+                {state.errors?.area && (
+                  <p className="text-sm text-destructive">
+                    {state.errors.area}
+                  </p>
+                )}
               </div>
             </div>
 
+            {/* خرید */}
             {transactionType === "buy" ? (
               <div className="space-y-2">
                 <Label htmlFor="price">مبلغ</Label>
@@ -275,11 +324,18 @@ export default function CreateAdForm({
                   defaultValue={data.price || ""}
                   placeholder="مبلغ به تومان"
                   inputMode="numeric"
-                  required
                 />
+
+                {state.errors?.price && (
+                  <p className="text-sm text-destructive">
+                    {state.errors.price}
+                  </p>
+                )}
               </div>
             ) : (
+              /* اجاره */
               <div className="grid gap-5 md:grid-cols-2">
+                {/* ودیعه */}
                 <div className="space-y-2">
                   <Label htmlFor="deposit">ودیعه</Label>
 
@@ -291,10 +347,16 @@ export default function CreateAdForm({
                     defaultValue={data.deposit || ""}
                     placeholder="مبلغ ودیعه"
                     inputMode="numeric"
-                    required
                   />
+
+                  {state.errors?.deposit && (
+                    <p className="text-sm text-destructive">
+                      {state.errors.deposit}
+                    </p>
+                  )}
                 </div>
 
+                {/* اجاره */}
                 <div className="space-y-2">
                   <Label htmlFor="rent">اجاره ماهانه</Label>
 
@@ -306,8 +368,13 @@ export default function CreateAdForm({
                     defaultValue={data.rent || ""}
                     placeholder="مبلغ اجاره"
                     inputMode="numeric"
-                    required
                   />
+
+                  {state.errors?.rent && (
+                    <p className="text-sm text-destructive">
+                      {state.errors.rent}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -335,7 +402,7 @@ export default function CreateAdForm({
             emptyText="هنوز قانونی اضافه نشده است."
           />
 
-          {/* تاریخ ساخت */}
+          {/* مشخصات ملک */}
           <section className="space-y-5">
             <div>
               <h2 className="font-heading text-base font-semibold text-primary">
@@ -345,31 +412,39 @@ export default function CreateAdForm({
 
             <Separator />
 
+            {/* تاریخ ساخت */}
             <div className="max-w-sm space-y-2">
               <Label htmlFor="constructionDate">تاریخ ساخت</Label>
 
-              <Input
-                id="constructionDate"
-                name="constructionDate"
-                type="text"
-                defaultValue={data.constructionDate}
-                placeholder="تاریخ ساخت"
+              <DatePicker
+                calendar={persian}
+                locale={persian_fa}
+                calendarPosition="bottom-right"
+                format="YYYY/MM/DD"
+                value={constructionDate}
+                onChange={(date: DateObject | null) => {
+                  const value = date ? date.format("YYYY/MM/DD") : "";
+
+                  setConstructionDate(value);
+                }}
+                inputClass="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               />
+
+              <input
+                type="hidden"
+                name="constructionDate"
+                value={constructionDate}
+              />
+
+              {state.errors?.constructionDate && (
+                <p className="text-sm text-destructive">
+                  {state.errors.constructionDate}
+                </p>
+              )}
             </div>
           </section>
 
-          {/* نتیجه Action */}
-          {state.message && (
-            <div
-              className={
-                state.success
-                  ? "rounded-md border border-border bg-secondary p-3 text-sm"
-                  : "rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-              }
-            >
-              {state.message}
-            </div>
-          )}
+
 
           {/* Submit */}
           <div className="flex justify-end border-t border-border pt-6">

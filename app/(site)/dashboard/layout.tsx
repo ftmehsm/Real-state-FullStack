@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import DashboardSidebar from "@/components/dashboard/Sidebar";
+import { Toaster } from "@/components/ui/toast";
 
 export default async function DashboardLayout({
   children,
@@ -29,6 +30,8 @@ export default async function DashboardLayout({
         <main className="min-w-0 rounded-2xl border bg-card p-6">
           {children}
         </main>
+        <Toaster />
+
       </div>
     </section>
   );
