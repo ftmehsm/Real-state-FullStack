@@ -2,8 +2,7 @@
 
 import CreateAdForm from "@/components/ads/CreateAdForm";
 import { createAd } from "@/app/actions/create-ad.action";
-
-const categories = ["آپارتمان", "ویلا", "زمین", "مغازه", "دفتر"];
+import { categories } from "@/const/ad";
 
 export default function CreateAdPage() {
   return (

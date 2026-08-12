@@ -46,9 +46,14 @@ export type AdActionState = {
   };
 };
 
+interface CategoryItem {
+  key: string;
+  name: string;
+}
+
 export interface CreateAdFormProps {
   initialData?: Partial<Ad>;
-  categories: string[];
+  categories: CategoryItem[];
   action: (state: AdActionState, formData: FormData) => Promise<AdActionState>;
   isEditing?: boolean;
 }

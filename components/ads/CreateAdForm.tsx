@@ -156,8 +156,8 @@ export default function CreateAdForm({
 
                   <SelectContent>
                     {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
+                      <SelectItem key={category.key} value={category.key}>
+                        {category.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
