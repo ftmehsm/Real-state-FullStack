@@ -9,7 +9,7 @@ export default async function SiteLayout({
   return (
     <>
       <Header />
-      <main className="flex-1 p-4">{children}</main>
+      <main className="flex-1 p-4 container mx-auto">{children}</main>
       <Footer />
     </>
   );
