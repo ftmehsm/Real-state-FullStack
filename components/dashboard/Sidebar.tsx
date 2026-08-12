@@ -23,7 +23,7 @@ type DashboardSidebarProps = {
 
 export default function DashboardSidebar({ user }: DashboardSidebarProps) {
   return (
-    <aside className="w-full lg:max-w-72 shrink-0 rounded-2xl border bg-card p-6">
+    <aside className="w-full lg:max-w-72 shrink-0 rounded-2xl border bg-card p-6 h-fit">
       <div className="flex flex-col items-center gap-4">
         <Avatar className="size-20">
           <AvatarFallback className="text-xl">
