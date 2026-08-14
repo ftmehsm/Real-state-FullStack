@@ -31,6 +31,7 @@ import DynamicStringList from "./dynamic-string-list";
 
 const initialActionState: AdActionState = {
   success: false,
+  data: undefined,
   errors: {},
 };
 
@@ -68,21 +69,22 @@ export default function CreateAdForm({
 
   useEffect(() => {
     if (!state.message) return;
-  
+
     if (state.success) {
       toast.add({
         type: "success",
         description: state.message,
-      })
+      });
+      console.log(state.data);
     } else {
       toast.add({
         type: "error",
         description: state.message,
         priority: "high",
-      })
+      });
     }
   }, [state.message, state.success]);
-  
+
   const data = {
     ...defaultData,
     ...initialData,
@@ -99,8 +101,6 @@ export default function CreateAdForm({
   const [constructionDate, setConstructionDate] = useState(
     data.constructionDate,
   );
-
-  
 
   return (
     <form action={formAction}>
@@ -265,9 +265,9 @@ export default function CreateAdForm({
                   name="transactionType"
                   value={transactionType}
                   onValueChange={(value) => {
-                    const type = value as TransactionType;
-
-                    setTransactionType(type);
+                    if (value === "buy" || value === "rent") {
+                      setTransactionType(value);
+                    }
                   }}
                 >
                   <SelectTrigger id="transactionType">
@@ -443,8 +443,6 @@ export default function CreateAdForm({
               )}
             </div>
           </section>
-
-
 
           {/* Submit */}
           <div className="flex justify-end border-t border-border pt-6">
