@@ -1,6 +1,6 @@
 "use server";
 
-import { createAd } from "@/lib/services/ads.services";
+import { createAd } from "@/lib/services/create-ad.services";
 import type {
   AdActionState,
   TransactionType,
@@ -235,27 +235,41 @@ export async function createAdAction(
     phone,
     description,
     address,
-
     transactionType,
-
     area: areaNumber,
-
-    price: priceNumber,
-    deposit: depositNumber,
-    rent: rentNumber,
-
     constructionDate,
-
     amenities,
     rules,
+  
+    ...(transactionType === "buy"
+      ? {
+          price: priceNumber,
+        }
+      : {
+          deposit: depositNumber,
+          rent: rentNumber,
+        }),
   };
 
-  const createdAd = await createAd(data);
-
-  return {
-    success: true,
-    data : createdAd ,
-    message: "آگهی با موفقیت دریافت شد.",
-    errors: {},
-  };
+  try {
+    const createdAd = await createAd(data);
+  
+    return {
+      success: true,
+      data: createdAd,
+      message: "آگهی با موفقیت ایجاد شد.",
+      errors: {},
+    };
+  } catch (error) {
+    console.error(error);
+  
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "خطایی در ایجاد آگهی رخ داد.",
+      errors: {},
+    };
+  }
 }
