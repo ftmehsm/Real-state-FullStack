@@ -1,11 +1,16 @@
 "use server";
 
 import { createAd } from "@/lib/services/create-ad.services";
+
 import type {
   AdActionState,
   TransactionType,
-  Ad
 } from "@/types/types";
+
+type AdImage = {
+  url: string;
+  key: string;
+};
 
 function isTransactionType(
   value: string,
@@ -13,29 +18,92 @@ function isTransactionType(
   return value === "buy" || value === "rent";
 }
 
+function parseImages(value: string): AdImage[] | null {
+  try {
+    const parsed: unknown = JSON.parse(value);
+
+    if (!Array.isArray(parsed)) {
+      return null;
+    }
+
+    const images: AdImage[] = [];
+
+    for (const item of parsed) {
+      if (
+        typeof item !== "object" ||
+        item === null ||
+        !("url" in item) ||
+        !("key" in item)
+      ) {
+        return null;
+      }
+
+      const url = item.url;
+      const key = item.key;
+
+      if (
+        typeof url !== "string" ||
+        typeof key !== "string" ||
+        !url.trim() ||
+        !key.trim()
+      ) {
+        return null;
+      }
+
+      images.push({
+        url: url.trim(),
+        key: key.trim(),
+      });
+    }
+
+    return images;
+  } catch {
+    return null;
+  }
+}
+
 export async function createAdAction(
   _prevState: AdActionState,
   formData: FormData,
 ): Promise<AdActionState> {
-  const name = formData.get("name")?.toString().trim() ?? "";
-  const category = formData.get("category")?.toString().trim() ?? "";
-  const phone = formData.get("phone")?.toString().trim() ?? "";
-  const agency = formData.get("agency")?.toString().trim() ?? "";
+  const name =
+    formData.get("name")?.toString().trim() ?? "";
+
+  const category =
+    formData.get("category")?.toString().trim() ?? "";
+
+  const phone =
+    formData.get("phone")?.toString().trim() ?? "";
+
+  const agency =
+    formData.get("agency")?.toString().trim() ?? "";
+
   const description =
     formData.get("description")?.toString().trim() ?? "";
-  const address = formData.get("address")?.toString().trim() ?? "";
+
+  const address =
+    formData.get("address")?.toString().trim() ?? "";
 
   const transactionTypeRaw =
     formData.get("transactionType")?.toString().trim() ?? "";
 
-  const area = formData.get("area")?.toString().trim() ?? "";
+  const area =
+    formData.get("area")?.toString().trim() ?? "";
 
-  const price = formData.get("price")?.toString().trim() ?? "";
-  const deposit = formData.get("deposit")?.toString().trim() ?? "";
-  const rent = formData.get("rent")?.toString().trim() ?? "";
+  const price =
+    formData.get("price")?.toString().trim() ?? "";
+
+  const deposit =
+    formData.get("deposit")?.toString().trim() ?? "";
+
+  const rent =
+    formData.get("rent")?.toString().trim() ?? "";
 
   const constructionDate =
     formData.get("constructionDate")?.toString().trim() ?? "";
+
+  const imagesRaw =
+    formData.get("images")?.toString() ?? "[]";
 
   const errors: AdActionState["errors"] = {};
 
@@ -73,13 +141,27 @@ export async function createAdAction(
   }
 
   // -------------------------
-  // بررسی TransactionType
+  // transactionType
   // -------------------------
 
   if (!isTransactionType(transactionTypeRaw)) {
     errors.transactionType = !transactionTypeRaw
       ? "پر کردن این فیلد الزامی است"
       : "نوع معامله نامعتبر است";
+  }
+
+  // -------------------------
+  // تصاویر
+  // -------------------------
+
+  const images = parseImages(imagesRaw);
+
+  if (images === null) {
+    errors.images = "اطلاعات تصاویر نامعتبر است.";
+  } else if (images.length === 0) {
+    errors.images = "حداقل یک تصویر برای آگهی انتخاب کنید.";
+  } else if (images.length > 10) {
+    errors.images = "حداکثر ۱۰ تصویر مجاز است.";
   }
 
   // -------------------------
@@ -92,16 +174,18 @@ export async function createAdAction(
 
   if (transactionTypeRaw === "rent") {
     if (!deposit) {
-      errors.deposit = "پر کردن این فیلد الزامی است";
+      errors.deposit =
+        "پر کردن این فیلد الزامی است";
     }
 
     if (!rent) {
-      errors.rent = "پر کردن این فیلد الزامی است";
+      errors.rent =
+        "پر کردن این فیلد الزامی است";
     }
   }
 
   // -------------------------
-  // اگر خطاهای معمولی وجود دارد
+  // خطاهای اولیه
   // -------------------------
 
   if (Object.keys(errors).length > 0) {
@@ -113,8 +197,7 @@ export async function createAdAction(
   }
 
   // -------------------------
-  // اینجا TypeScript می‌داند:
-  // transactionTypeRaw = "buy" | "rent"
+  // Type narrowing
   // -------------------------
 
   if (!isTransactionType(transactionTypeRaw)) {
@@ -122,27 +205,51 @@ export async function createAdAction(
       success: false,
       message: "نوع معامله نامعتبر است.",
       errors: {
-        transactionType: "نوع معامله نامعتبر است",
+        transactionType:
+          "نوع معامله نامعتبر است",
       },
     };
   }
 
-  const transactionType: TransactionType = transactionTypeRaw;
+  if (!images) {
+    return {
+      success: false,
+      message: "اطلاعات تصاویر نامعتبر است.",
+      errors: {
+        images: "تصاویر نامعتبر هستند.",
+      },
+    };
+  }
+
+  const transactionType: TransactionType =
+    transactionTypeRaw;
 
   // -------------------------
-  // تبدیل مقادیر عددی
+  // تبدیل عددها
   // -------------------------
 
   const areaNumber = Number(area);
-  const priceNumber = price ? Number(price) : 0;
-  const depositNumber = deposit ? Number(deposit) : 0;
-  const rentNumber = rent ? Number(rent) : 0;
+
+  const priceNumber = price
+    ? Number(price)
+    : undefined;
+
+  const depositNumber = deposit
+    ? Number(deposit)
+    : undefined;
+
+  const rentNumber = rent
+    ? Number(rent)
+    : undefined;
 
   // -------------------------
-  // بررسی عدد بودن متراژ
+  // بررسی متراژ
   // -------------------------
 
-  if (!Number.isFinite(areaNumber) || areaNumber < 0) {
+  if (
+    !Number.isFinite(areaNumber) ||
+    areaNumber < 0
+  ) {
     return {
       success: false,
       message: "مقدار متراژ نامعتبر است.",
@@ -153,12 +260,16 @@ export async function createAdAction(
   }
 
   // -------------------------
-  // بررسی مبلغ خرید
+  // بررسی خرید
   // -------------------------
 
   if (
     transactionType === "buy" &&
-    (!Number.isFinite(priceNumber) || priceNumber < 0)
+    (
+      priceNumber === undefined ||
+      !Number.isFinite(priceNumber) ||
+      priceNumber < 0
+    )
   ) {
     return {
       success: false,
@@ -170,11 +281,12 @@ export async function createAdAction(
   }
 
   // -------------------------
-  // بررسی اطلاعات اجاره
+  // بررسی اجاره
   // -------------------------
 
   if (transactionType === "rent") {
     if (
+      depositNumber === undefined ||
       !Number.isFinite(depositNumber) ||
       depositNumber < 0
     ) {
@@ -182,17 +294,23 @@ export async function createAdAction(
         success: false,
         message: "مبلغ ودیعه نامعتبر است.",
         errors: {
-          deposit: "ودیعه باید یک عدد معتبر باشد",
+          deposit:
+            "ودیعه باید یک عدد معتبر باشد",
         },
       };
     }
 
-    if (!Number.isFinite(rentNumber) || rentNumber < 0) {
+    if (
+      rentNumber === undefined ||
+      !Number.isFinite(rentNumber) ||
+      rentNumber < 0
+    ) {
       return {
         success: false,
         message: "مبلغ اجاره نامعتبر است.",
         errors: {
-          rent: "اجاره باید یک عدد معتبر باشد",
+          rent:
+            "اجاره باید یک عدد معتبر باشد",
         },
       };
     }
@@ -225,7 +343,7 @@ export async function createAdAction(
     .map((item) => item.trim());
 
   // -------------------------
-  // داده نهایی مطابق Ad
+  // داده نهایی
   // -------------------------
 
   const data = {
@@ -240,7 +358,8 @@ export async function createAdAction(
     constructionDate,
     amenities,
     rules,
-  
+    images,
+
     ...(transactionType === "buy"
       ? {
           price: priceNumber,
@@ -251,9 +370,13 @@ export async function createAdAction(
         }),
   };
 
+  // -------------------------
+  // Service
+  // -------------------------
+
   try {
     const createdAd = await createAd(data);
-  
+
     return {
       success: true,
       data: createdAd,
@@ -261,8 +384,8 @@ export async function createAdAction(
       errors: {},
     };
   } catch (error) {
-    console.error(error);
-  
+    console.error("createAdAction error:", error);
+
     return {
       success: false,
       message:

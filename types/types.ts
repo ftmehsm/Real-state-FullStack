@@ -16,9 +16,9 @@ export interface Ad {
   category: string;
   transactionType: TransactionType;
 
-  price: number;
-  deposit: number;
-  rent: number;
+  price?: number;
+  deposit?: number;
+  rent?: number;
 
   area: number;
 
@@ -26,6 +26,8 @@ export interface Ad {
   rules: string[];
 
   constructionDate: string;
+
+  images: AdImage[];
 }
 
 export type AdActionState = {
@@ -44,6 +46,7 @@ export type AdActionState = {
     deposit?: string;
     rent?: string;
     constructionDate?: string;
+    images?: string
   };
 };
 
@@ -51,6 +54,11 @@ export interface CategoryItem {
   key: string;
   name: string;
 }
+
+export type AdImage = {
+  url: string;
+  key: string;
+};
 
 export interface CreateAdFormProps {
   initialData?: Partial<Ad>;

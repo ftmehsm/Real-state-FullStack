@@ -77,6 +77,19 @@ const adSchema = new Schema(
       default: "",
     },
 
+    images: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        key: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",

@@ -28,6 +28,12 @@ import type {
 } from "@/types/types";
 
 import DynamicStringList from "./dynamic-string-list";
+import { UploadDropzone } from "@/utils/uploadthing";
+
+type AdImage = {
+  url: string;
+  key: string;
+};
 
 const initialActionState: AdActionState = {
   success: false,
@@ -54,6 +60,8 @@ const defaultData: Ad = {
   rules: [],
 
   constructionDate: "",
+
+  images: [],
 };
 
 export default function CreateAdForm({
@@ -67,6 +75,31 @@ export default function CreateAdForm({
     initialActionState,
   );
 
+  const data = {
+    ...defaultData,
+    ...initialData,
+    images: initialData?.images ?? [],
+  };
+
+  const [images, setImages] = useState<AdImage[]>(
+    data.images ?? [],
+  );
+
+  const [transactionType, setTransactionType] =
+    useState<TransactionType>(data.transactionType);
+
+  const [amenities, setAmenities] = useState<string[]>(
+    data.amenities ?? [],
+  );
+
+  const [rules, setRules] = useState<string[]>(
+    data.rules ?? [],
+  );
+
+  const [constructionDate, setConstructionDate] = useState(
+    data.constructionDate ?? "",
+  );
+
   useEffect(() => {
     if (!state.message) return;
 
@@ -75,6 +108,7 @@ export default function CreateAdForm({
         type: "success",
         description: state.message,
       });
+
       console.log(state.data);
     } else {
       toast.add({
@@ -83,30 +117,13 @@ export default function CreateAdForm({
         priority: "high",
       });
     }
-  }, [state.message, state.success]);
-
-  const data = {
-    ...defaultData,
-    ...initialData,
-  };
-
-  const [transactionType, setTransactionType] = useState<TransactionType>(
-    data.transactionType,
-  );
-
-  const [amenities, setAmenities] = useState<string[]>(data.amenities);
-
-  const [rules, setRules] = useState<string[]>(data.rules);
-
-  const [constructionDate, setConstructionDate] = useState(
-    data.constructionDate,
-  );
+  }, [state.message, state.success, state.data]);
 
   return (
     <form action={formAction}>
-      <Card className="ring-0">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-3xl text-primary">
+          <CardTitle>
             {isEditing ? "ویرایش آگهی" : "ثبت آگهی"}
           </CardTitle>
         </CardHeader>
@@ -149,14 +166,20 @@ export default function CreateAdForm({
               <div className="space-y-2">
                 <Label htmlFor="category">دسته‌بندی</Label>
 
-                <Select name="category" defaultValue={data.category}>
+                <Select
+                  name="category"
+                  defaultValue={data.category}
+                >
                   <SelectTrigger id="category">
                     <SelectValue placeholder="دسته‌بندی را انتخاب کنید" />
                   </SelectTrigger>
 
                   <SelectContent>
                     {categories.map((category) => (
-                      <SelectItem key={category.key} value={category.key}>
+                      <SelectItem
+                        key={category.key}
+                        value={category.key}
+                      >
                         {category.name}
                       </SelectItem>
                     ))}
@@ -259,7 +282,9 @@ export default function CreateAdForm({
             <div className="grid gap-5 md:grid-cols-2">
               {/* نوع معامله */}
               <div className="space-y-2">
-                <Label htmlFor="transactionType">نوع معامله</Label>
+                <Label htmlFor="transactionType">
+                  نوع معامله
+                </Label>
 
                 <Select
                   name="transactionType"
@@ -272,13 +297,14 @@ export default function CreateAdForm({
                 >
                   <SelectTrigger id="transactionType">
                     <SelectValue placeholder="نوع معامله را انتخاب کنید">
-                      {transactionType === "buy" ? "خرید" : "اجاره"}
+                      {transactionType === "buy"
+                        ? "خرید"
+                        : "اجاره"}
                     </SelectValue>
                   </SelectTrigger>
 
                   <SelectContent>
                     <SelectItem value="buy">خرید</SelectItem>
-
                     <SelectItem value="rent">اجاره</SelectItem>
                   </SelectContent>
                 </Select>
@@ -333,7 +359,6 @@ export default function CreateAdForm({
                 )}
               </div>
             ) : (
-              /* اجاره */
               <div className="grid gap-5 md:grid-cols-2">
                 {/* ودیعه */}
                 <div className="space-y-2">
@@ -414,7 +439,9 @@ export default function CreateAdForm({
 
             {/* تاریخ ساخت */}
             <div className="max-w-sm space-y-2">
-              <Label htmlFor="constructionDate">تاریخ ساخت</Label>
+              <Label htmlFor="constructionDate">
+                تاریخ ساخت
+              </Label>
 
               <DatePicker
                 calendar={persian}
@@ -423,7 +450,9 @@ export default function CreateAdForm({
                 format="YYYY/MM/DD"
                 value={constructionDate}
                 onChange={(date: DateObject | null) => {
-                  const value = date ? date.format("YYYY/MM/DD") : "";
+                  const value = date
+                    ? date.format("YYYY/MM/DD")
+                    : "";
 
                   setConstructionDate(value);
                 }}
@@ -444,9 +473,104 @@ export default function CreateAdForm({
             </div>
           </section>
 
+          {/* تصاویر */}
+          <section className="space-y-5">
+            <div>
+              <h2 className="font-heading text-base font-semibold text-primary">
+                تصاویر ملک
+              </h2>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                حداکثر 2 تصویر، هر تصویر حداکثر ۸ مگابایت
+              </p>
+            </div>
+
+            <UploadDropzone
+              endpoint="adImage"
+              config={{
+                mode: "auto",
+              }}
+              onClientUploadComplete={(res) => {
+                const uploadedImages: AdImage[] = res.map(
+                  (file) => ({
+                    url: file.ufsUrl,
+                    key: file.key,
+                  }),
+                );
+
+                setImages((prev) => {
+                  const merged = [...prev, ...uploadedImages];
+
+                  return merged.slice(0, 2);
+                });
+              }}
+              onUploadError={(error) => {
+                console.error(error);
+
+                toast.add({
+                  type: "error",
+                  description: error.message,
+                  priority: "high",
+                });
+              }}
+            />
+
+            {/* تصاویر برای Server Action */}
+            <input
+              type="hidden"
+              name="images"
+              value={JSON.stringify(images)}
+            />
+
+            {state.errors?.images && (
+              <p className="text-sm text-destructive">
+                {state.errors.images}
+              </p>
+            )}
+
+            {images.length > 0 && (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                {images.map((image) => (
+                  <div
+                    key={image.key}
+                    className="relative overflow-hidden rounded-md border"
+                  >
+                    <img
+                      src={image.url}
+                      alt="تصویر ملک"
+                      className="aspect-square w-full object-cover"
+                    />
+
+                    <button
+                      type="button"
+                      className="absolute right-2 top-2 rounded-md bg-destructive px-2 py-1 text-xs text-white"
+                      onClick={() => {
+                        setImages((prev) =>
+                          prev.filter(
+                            (item) => item.key !== image.key,
+                          ),
+                        );
+                      }}
+                    >
+                      حذف
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <p className="text-sm text-muted-foreground">
+              {images.length} از 2 تصویر
+            </p>
+          </section>
+
           {/* Submit */}
           <div className="flex justify-end border-t border-border pt-6">
-            <Button type="submit" disabled={isPending} className="min-w-32">
+            <Button
+              type="submit"
+              disabled={isPending || images.length > 10}
+              className="min-w-32"
+            >
               {isPending
                 ? "در حال ذخیره..."
                 : isEditing
