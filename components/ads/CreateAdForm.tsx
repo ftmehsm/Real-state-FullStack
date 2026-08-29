@@ -29,6 +29,7 @@ import type {
 
 import DynamicStringList from "./dynamic-string-list";
 import { UploadDropzone } from "@/utils/uploadthing";
+import { useRouter } from "next/navigation";
 
 type AdImage = {
   url: string;
@@ -62,6 +63,7 @@ const defaultData: Ad = {
   constructionDate: "",
 
   images: [],
+  
 };
 
 export default function CreateAdForm({
@@ -100,6 +102,8 @@ export default function CreateAdForm({
     data.constructionDate ?? "",
   );
 
+  const router = useRouter()
+
   useEffect(() => {
     if (!state.message) return;
 
@@ -108,6 +112,8 @@ export default function CreateAdForm({
         type: "success",
         description: state.message,
       });
+
+      router.push("/dashboard/my-ads")
 
       console.log(state.data);
     } else {
@@ -121,9 +127,9 @@ export default function CreateAdForm({
 
   return (
     <form action={formAction}>
-      <Card>
+      <Card className="border-0 ring-0">
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="text-3xl">
             {isEditing ? "ویرایش آگهی" : "ثبت آگهی"}
           </CardTitle>
         </CardHeader>
