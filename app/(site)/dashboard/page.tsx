@@ -4,13 +4,12 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import User from "@/models/User";
 import InfoCards from "@/components/dashboard/InfoCards";
 import connectDB from "@/utils/connectDB";
+import getCurrentUser from "@/utils/getCurrentUser";
 
 export default async function DashboardPage() {
   await connectDB();
 
-  const session = await getServerSession(authOptions);
-
-  const user = await User.findOne({ email: session?.user?.email });
+  const user =await getCurrentUser()
 
   return (
     <div className="space-y-8">
@@ -18,7 +17,7 @@ export default async function DashboardPage() {
         <h1 className="text-3xl font-bold">داشبورد</h1>
 
         <p className="mt-2 text-muted-foreground">
-          {session?.user?.name}، خوش آمدید.
+          {user?.name}، خوش آمدید.
         </p>
       </div>
 
