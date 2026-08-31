@@ -30,8 +30,6 @@ export interface Ad {
   images: AdImage[];
 
   _id?: string
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export type AdActionState = {

@@ -7,23 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 import { Ad } from "@/types/types";
-import findCat, { getAdTypeLabel } from "@/utils/help";
+import findCat, { formatDate, formatPrice, getAdTypeLabel } from "@/utils/help";
 
 type MyAdCardProps = {
-  ad: Ad;
+  ad: Ad & {
+    createdAt: Date;
+    updatedAt: Date;
+  };
   deleteAction: (formData: FormData) => void | Promise<void>;
-};
-
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("fa-IR").format(price);
-};
-
-const formatDate = (date: Date | string) => {
-  return new Intl.DateTimeFormat("fa-IR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date(date));
 };
 
 export default function MyAdCard({ ad, deleteAction }: MyAdCardProps) {
